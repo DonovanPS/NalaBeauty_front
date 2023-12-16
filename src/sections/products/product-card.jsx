@@ -10,9 +10,11 @@ import { fCurrency } from 'src/utils/format-number';
 
 import Label from 'src/components/label';
 
+import RenderButton from './product-button';
+
 // ----------------------------------------------------------------------
 
-export default function ShopProductCard({ product }) {
+export default function ShopProductCard({ product, openFilter, onOpenFilter, onCloseFilter }) {
 
   let color = 'error';
 
@@ -36,7 +38,7 @@ export default function ShopProductCard({ product }) {
         textTransform: 'uppercase',
       }}
     >
-      {product.stock === 0 ? 'Out of Stock' : `Stock ${product.stock}`}
+      {product.stock === 0 ? 'Out of Stock' : `Stock: ${product.stock}`}
     </Label>
   );
 
@@ -88,6 +90,13 @@ export default function ShopProductCard({ product }) {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
 
           {renderPrice}
+
+          <RenderButton product={product} icon="eva:shopping-cart-fill" action= "addToCart" color= 'primary' />
+
+          <RenderButton product={product} icon="lucide:pencil" action = "edit" setOpenFilter={onOpenFilter} />
+          
+          <RenderButton product={product} icon="eva:trash-2-fill" action = "delete" color= 'error' />
+
         </Stack>
       </Stack>
     </Card>
@@ -96,4 +105,7 @@ export default function ShopProductCard({ product }) {
 
 ShopProductCard.propTypes = {
   product: PropTypes.object,
+  openFilter: PropTypes.bool,
+  onOpenFilter: PropTypes.func,
+  onCloseFilter: PropTypes.func,
 };

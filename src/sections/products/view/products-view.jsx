@@ -6,6 +6,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import { getProducts } from 'src/services/product';
+import { useProductContext } from 'src/contexts/product-Context';
 
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
@@ -17,6 +18,8 @@ import ProductCartWidget from '../product-cart-widget';
 export default function ProductsView() {
   const [openFilter, setOpenFilter] = useState(false);
 
+  const { reload } = useProductContext();
+
   const handleOpenFilter = () => {
     setOpenFilter(true);
   };
@@ -26,17 +29,16 @@ export default function ProductsView() {
   };
 
   const [products, setProducts] = useState([]);
- 
+
   useEffect(() => {
     getProducts()
-    .then(data => {
-      console.log(data.data);
-      setProducts(data.data);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-  }, []);
+      .then(data => {
+        setProducts(data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, [reload]);
 
 
   return (
@@ -66,7 +68,11 @@ export default function ProductsView() {
       <Grid container spacing={3}>
         {products.map((product) => (
           <Grid key={product._id} xs={12} sm={6} md={3}>
-            <ProductCard product={product} />
+            <ProductCard
+              product={product}
+              onOpenFilter={() => handleOpenFilter(product)}
+              onCloseFilter={handleCloseFilter}
+            />
           </Grid>
         ))}
       </Grid>
