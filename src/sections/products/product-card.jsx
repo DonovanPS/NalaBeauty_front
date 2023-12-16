@@ -9,15 +9,25 @@ import Typography from '@mui/material/Typography';
 import { fCurrency } from 'src/utils/format-number';
 
 import Label from 'src/components/label';
-import { ColorPreview } from 'src/components/color-utils';
 
 // ----------------------------------------------------------------------
 
 export default function ShopProductCard({ product }) {
+
+  let color = 'error';
+
+  if (product.stock > 50) {
+    color = 'success';
+  } else if (product.stock > 20) {
+    color = 'info';
+  } else {
+    color = 'error';
+  }
+
   const renderStatus = (
     <Label
       variant="filled"
-      color={(product.status === 'sale' && 'error') || 'info'}
+      color={color}
       sx={{
         zIndex: 9,
         top: 16,
@@ -26,7 +36,7 @@ export default function ShopProductCard({ product }) {
         textTransform: 'uppercase',
       }}
     >
-      {product.status}
+      {product.stock === 0 ? 'Out of Stock' : `Stock ${product.stock}`}
     </Label>
   );
 
@@ -65,7 +75,7 @@ export default function ShopProductCard({ product }) {
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        {product.status && renderStatus}
+        {renderStatus}
 
         {renderImg}
       </Box>
@@ -76,7 +86,7 @@ export default function ShopProductCard({ product }) {
         </Link>
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={product.colors} />
+
           {renderPrice}
         </Stack>
       </Stack>

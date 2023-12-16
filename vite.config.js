@@ -29,6 +29,9 @@ export default defineConfig({
   server: {
     port: 3030,
   },
+  define: {
+    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+  },
   preview: {
     port: 3030,
   },

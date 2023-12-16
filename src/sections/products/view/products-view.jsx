@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { products } from 'src/_mock/products';
+import { getProducts } from 'src/services/product';
 
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
@@ -24,6 +24,20 @@ export default function ProductsView() {
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
+
+  const [products, setProducts] = useState([]);
+ 
+  useEffect(() => {
+    getProducts()
+    .then(data => {
+      console.log(data.data);
+      setProducts(data.data);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  }, []);
+
 
   return (
     <Container>
@@ -51,7 +65,7 @@ export default function ProductsView() {
 
       <Grid container spacing={3}>
         {products.map((product) => (
-          <Grid key={product.id} xs={12} sm={6} md={3}>
+          <Grid key={product._id} xs={12} sm={6} md={3}>
             <ProductCard product={product} />
           </Grid>
         ))}
