@@ -5,7 +5,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-import { getProducts } from 'src/services/product';
+import { getProducts } from 'src/services/product-service';
 import { useProductContext } from 'src/contexts/product-Context';
 
 import ProductCard from '../product-card';
