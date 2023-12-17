@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { getProducts } from 'src/services/product-service';
 import { useProductContext } from 'src/contexts/product-Context';
 
+import NewProduct from '../product-new';
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
 import ProductFilters from '../product-filters';
@@ -17,7 +18,8 @@ import ProductCartWidget from '../product-cart-widget';
 
 export default function ProductsView() {
   const [openFilter, setOpenFilter] = useState(false);
-
+  const [openNewProduct, setOpenNewProduct] = useState(false);
+  const [editData, setEditData] = useState(null);
   const { reload } = useProductContext();
 
   const handleOpenFilter = () => {
@@ -27,6 +29,18 @@ export default function ProductsView() {
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
+
+  const handleOpenNewProduct = (product) => {
+    setEditData({ isOpen: true, data: product });
+    setOpenNewProduct(true);
+  };
+
+  const handleCloseNewProduct = () => {
+    setEditData(null);
+    setOpenNewProduct(false);
+  };
+
+
 
   const [products, setProducts] = useState([]);
 
@@ -55,6 +69,14 @@ export default function ProductsView() {
         sx={{ mb: 5 }}
       >
         <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
+
+          <NewProduct
+            openFilter={openNewProduct}
+            onOpenFilter={handleOpenNewProduct}
+            onCloseFilter={handleCloseNewProduct}
+            editData={editData}
+          />
+
           <ProductFilters
             openFilter={openFilter}
             onOpenFilter={handleOpenFilter}
