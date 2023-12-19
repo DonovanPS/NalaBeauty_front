@@ -10,9 +10,9 @@ import { getSalesByDate, getStatisticsMonth } from 'src/services/sales-service';
 
 import Toast from 'src/components/toast/toast';
 
-import AppCurrentVisits from '../app-current-visits';
 import AppWidgetSummary from '../app-widget-summary';
-import AppConversionRates from '../app-conversion-rates';
+import AppHistogramaSales from '../app-histogramSales';
+import AppCircularDiagram from '../app-circular-diagram';
 
 
 // ----------------------------------------------------------------------
@@ -141,7 +141,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={8}>
-          <AppConversionRates
+          <AppHistogramaSales
            title={`Ventas del ${currentDate.toLocaleDateString()}`}
            subheader="Análisis de las ventas en la fecha seleccionada"
             chart={{
@@ -154,7 +154,7 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={4}>
-          <AppCurrentVisits
+          <AppCircularDiagram
             title={`Ventas del ${currentDate.toLocaleDateString()}`}
             chart={{
               series: salesData.map((sale) => ({
