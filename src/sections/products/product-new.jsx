@@ -10,9 +10,9 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { Select, MenuItem, TextField, InputLabel, FormControl, FormHelperText } from '@mui/material';
 
-import { createProduct } from 'src/services/product-service';
 import { getCategories } from 'src/services/category-service';
 import { useProductContext } from 'src/contexts/product-Context';
+import { createProduct , updateProduct } from 'src/services/product-service';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -43,13 +43,13 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
       setImage(editData.data.image || '');
       setPrice(editData.data.price || '');
       setStock(editData.data.stock || '');
-      setCategory(editData.data.category || '');
+      setCategory(editData.data.category?._id || '');
     }
 
-    getCategories() .then((response) => {
-      setCategories(response.data); 
+    getCategories().then((response) => {
+      setCategories(response.data);
     })
-    .catch((error) => console.error('Error fetching categories:', error));
+      .catch((error) => console.error('Error fetching categories:', error));
   }, [editData]);
 
 
@@ -167,11 +167,12 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
             </MenuItem>
           ))}
         </Select>
+
         <FormHelperText style={{ color: 'red' }}>{validationErrors.category || ' '}</FormHelperText>
       </FormControl>
     </Stack>
   );
-  
+
 
   const saveProduct = () => {
     const data = {
@@ -197,7 +198,7 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
     const hasErrors = Object.keys(fieldsToValidate).some((field) => {
       if (!String(data[field]).trim()) {
         errors[field] = `El campo es obligatorio`;
-        return true; 
+        return true;
       }
       return false;
     });
@@ -208,22 +209,30 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
       return;
     }
 
-    createProduct(data).then((response) => {
-      if (response.state === true) {
-        reloadData();
-        onCloseFilter();
-      }
-    });
-
+    if (editData?.data?._id) {
+         updateProduct(editData.data._id, data).then((response) => {
+        if (response.state === true) {
+          reloadData();
+          onCloseFilter();
+        }
+      });
+    } else {
+      // Lógica para crear el producto
+      createProduct(data).then((response) => {
+        if (response.state === true) {
+          reloadData();
+          onCloseFilter();
+        }
+      });
+    }
   };
 
   useEffect(() => {
-    // Validar el formulario
     const isNameValid = name.trim() !== '';
     const isDescriptionValid = description.trim() !== '';
     const isImageValid = image.trim() !== '';
-    const isStockValid = stock.trim() !== '';
-    const isPriceValid = price.trim() !== '';
+    const isStockValid = stock !== '';
+    const isPriceValid = price !== '';
     const isCategoryValid = category.trim() !== '';
 
     setIsFormValid(

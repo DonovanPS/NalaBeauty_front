@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Stack, IconButton } from '@mui/material';
 
+import { disableProduct } from 'src/services/product-service';
 import { useProductContext } from 'src/contexts/product-Context';
 
 import Iconify from 'src/components/iconify';
@@ -17,24 +18,30 @@ export default function RenderButton({ product, icon, action, setOpenFilter, col
     } else if (action === 'edit') {
       setOpenFilter(true, product);
     } else if (action === 'delete') {
-     
-      fetch(`http://localhost:3000/products/${product._id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }).then((response) => {
-        reloadData();
-
-      });
+      disableProduct(product._id)
+        .then((response) => {
+          reloadData();
+        })
+        .catch((error) => console.error('Error disabling product:', error));
     }
   };
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <IconButton color={color} aria-label="add to shopping cart" onClick={handleClick}>
-        <Iconify icon={icon}  width={24} height={24} />
-      </IconButton>
+      {action === 'addToCart' ? (
+        <IconButton
+          color={color}
+          aria-label="add to shopping cart"
+          onClick={handleClick}
+          disabled={!product.state || product.stock <= 0}
+        >
+          <Iconify icon={icon} width={24} height={24} />
+        </IconButton>
+      ) : (
+        <IconButton color={color} aria-label={action} onClick={handleClick}>
+          <Iconify icon={icon} width={24} height={24} />
+        </IconButton>
+      )}
     </Stack>
   );
 }

@@ -11,3 +11,20 @@ export const getCategories = async () => {
     throw error;
   }
 };
+
+export const createCategory = async (data) => {
+  try {
+    const response = await fetch(`${API_URL}/categories`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error al crear categoria:', error);
+    throw error;
+  }
+}

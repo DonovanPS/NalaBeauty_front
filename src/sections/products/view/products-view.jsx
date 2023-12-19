@@ -1,3 +1,5 @@
+/* eslint-disable unused-imports/no-unused-imports */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 
 import Stack from '@mui/material/Stack';
@@ -12,6 +14,7 @@ import NewProduct from '../product-new';
 import ProductCard from '../product-card';
 import ProductSort from '../product-sort';
 import ProductFilters from '../product-filters';
+import NewCategory from '../product-new-category';
 import ProductCartWidget from '../product-cart-widget';
 
 // ----------------------------------------------------------------------
@@ -19,9 +22,10 @@ import ProductCartWidget from '../product-cart-widget';
 export default function ProductsView() {
   const [openFilter, setOpenFilter] = useState(false);
   const [openNewProduct, setOpenNewProduct] = useState(false);
+  const [openNewCategory, setOpenNewCategory] = useState(false);
   const [editData, setEditData] = useState(null);
   const { reload } = useProductContext();
-
+/*
   const handleOpenFilter = () => {
     setOpenFilter(true);
   };
@@ -29,6 +33,8 @@ export default function ProductsView() {
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
+
+  */
 
   const handleOpenNewProduct = (product) => {
     setEditData({ isOpen: true, data: product });
@@ -38,6 +44,14 @@ export default function ProductsView() {
   const handleCloseNewProduct = () => {
     setEditData(null);
     setOpenNewProduct(false);
+  };
+
+  const handleOpenNewCategory = () => {
+    setOpenNewCategory(true);
+  };
+
+  const handleCloseNewCategory = () => {
+    setOpenNewCategory(false);
   };
 
 
@@ -77,13 +91,23 @@ export default function ProductsView() {
             editData={editData}
           />
 
-          <ProductFilters
-            openFilter={openFilter}
-            onOpenFilter={handleOpenFilter}
-            onCloseFilter={handleCloseFilter}
+          <NewCategory
+            openFilter={openNewCategory}
+            onOpenFilter={handleOpenNewCategory}
+            onCloseFilter={handleCloseNewCategory}
           />
 
+          {/* 
+<ProductFilters
+  openFilter={openFilter}
+  onOpenFilter={handleOpenFilter}
+  onCloseFilter={handleCloseFilter}
+/>
+
+
+
           <ProductSort />
+      */}
         </Stack>
       </Stack>
 
@@ -92,8 +116,8 @@ export default function ProductsView() {
           <Grid key={product._id} xs={12} sm={6} md={3}>
             <ProductCard
               product={product}
-              onOpenFilter={() => handleOpenFilter(product)}
-              onCloseFilter={handleCloseFilter}
+              onOpenFilter={() => handleOpenNewProduct(product)}
+              onCloseFilter={handleCloseNewProduct}
             />
           </Grid>
         ))}

@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 import SvgColor from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
@@ -8,20 +9,21 @@ const icon = (name) => (
 
 const navConfig = [
   {
-    title: 'dashboard',
+    title: 'Ventas',
     path: '/',
     icon: icon('ic_analytics'),
   },
-  {
+  /* {
     title: 'user',
     path: '/user',
     icon: icon('ic_user'),
-  },
+  },*/
   {
-    title: 'product',
+    title: 'Productos',
     path: '/products',
     icon: icon('ic_cart'),
   },
+  /* 
   {
     title: 'blog',
     path: '/blog',
@@ -32,11 +34,11 @@ const navConfig = [
     path: '/login',
     icon: icon('ic_lock'),
   },
-  {
+ {
     title: 'Not found',
     path: '/404',
     icon: icon('ic_disabled'),
-  },
+  },*/
 ];
 
 export default navConfig;

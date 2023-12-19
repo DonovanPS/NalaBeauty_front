@@ -29,3 +29,28 @@ export const createSale = async (sale) => {
         throw error;
     }
 };
+
+export const getStatisticsMonth = async (month) => {
+    try {
+        const response = await fetch(`${API_URL}/sales/statistics/${month}`);
+        const data = await response.json();
+        return data;
+    }catch (error) {
+        console.error('Error obtener ventas:', error);
+        throw error;
+      
+    }
+}
+
+
+export const getSalesByDate = async (date) => {
+    try {
+        const response = await fetch(`${API_URL}/sales/byDate/${date}`);
+        const data = await response.json();
+        return data;
+    }catch (error) {
+        console.error('Error obtener ventas:', error);
+        throw error;
+      
+    }
+}

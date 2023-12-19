@@ -26,7 +26,7 @@ export default function ShopProductCard({ product, openFilter, onOpenFilter, onC
     color = 'error';
   }
 
-  const renderStatus = (
+  const renderStok = (
     <Label
       variant="filled"
       color={color}
@@ -41,6 +41,23 @@ export default function ShopProductCard({ product, openFilter, onOpenFilter, onC
       {product.stock === 0 ? 'Out of Stock' : `Stock: ${product.stock}`}
     </Label>
   );
+
+  const renderStatus = (
+    <Label
+      variant="filled"
+      color={product.state ? 'success' : 'error'}
+      sx={{
+        zIndex: 9,
+        top: 45,
+        right: 16,
+        position: 'absolute',
+        textTransform: 'uppercase',
+      }}
+    >
+      {product.state ? 'Activo' : 'Inactivo'}
+    </Label>
+  );
+  
 
   const renderImg = (
     <Box
@@ -77,7 +94,7 @@ export default function ShopProductCard({ product, openFilter, onOpenFilter, onC
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        {renderStatus}
+        {renderStok}
 
         {renderImg}
       </Box>
@@ -90,6 +107,7 @@ export default function ShopProductCard({ product, openFilter, onOpenFilter, onC
         <Stack direction="row" alignItems="center" justifyContent="space-between">
 
           {renderPrice}
+          {renderStatus}
 
           <RenderButton product={product} icon="eva:shopping-cart-fill" action= "addToCart" color= 'primary' />
 

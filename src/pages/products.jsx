@@ -11,7 +11,7 @@ export default function ProductsPage() {
     
       <ProductProvider>
         <Helmet>
-          <title> Products | Minimal UI </title>
+          <title> Products | NalaBeauty </title>
         </Helmet>
         <ProductsView />
       </ProductProvider>
