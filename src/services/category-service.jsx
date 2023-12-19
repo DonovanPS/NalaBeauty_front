@@ -28,3 +28,20 @@ export const createCategory = async (data) => {
     throw error;
   }
 }
+
+export const updateCategory = async (id, data) => {
+  try {
+    const response = await fetch(`${API_URL}/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error al actualizar categoria:', error);
+    throw error;
+  }
+}

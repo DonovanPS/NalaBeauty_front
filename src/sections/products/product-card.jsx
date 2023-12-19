@@ -63,7 +63,7 @@ export default function ShopProductCard({ product, openFilter, onOpenFilter, onC
     <Box
       component="img"
       alt={product.name}
-      src={product.cover}
+      src={product.image}
       sx={{
         top: 0,
         width: 1,

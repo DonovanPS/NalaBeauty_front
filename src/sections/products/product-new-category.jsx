@@ -5,15 +5,15 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
-import { TextField } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import { Select, MenuItem, TextField, InputLabel, FormControl, FormHelperText } from '@mui/material';
 
-// eslint-disable-next-line spaced-comment
-import { createCategory } from 'src/services/category-service';
 // import { createProduct } from 'src/services/product-service';
 import { useProductContext } from 'src/contexts/product-Context';
+// eslint-disable-next-line spaced-comment
+import { getCategories, createCategory, updateCategory } from 'src/services/category-service';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -31,7 +31,65 @@ export default function NewCategory({ openFilter, onOpenFilter, onCloseFilter, e
     const [validationErrors, setValidationErrors] = useState({});
     // eslint-disable-next-line no-unused-vars
     const { reloadData } = useProductContext();
+    const [categories, setCategories] = useState([]);
+    const [category, setCategory] = useState('');
+    
 
+    const getCategoris = () => {
+        getCategories().then((response) => {
+            setCategories(response.data);
+          }).catch((error) => console.error('Error fetching categories:', error));
+    }
+
+    useEffect(() => {
+        getCategoris();
+      }, []);
+
+      useEffect(() => {
+        const isNameValid = name.trim() !== '';
+        const isDescriptionValid = description.trim() !== '';
+
+
+        setIsFormValid(
+            isNameValid && isDescriptionValid
+        );
+    }, [name, description]);
+     
+
+
+    const renderSelectCategory = (
+        <Stack spacing={1}>
+        <Typography variant="subtitle2">Categoría</Typography>
+        <FormControl variant="outlined">
+          <InputLabel htmlFor="outlined-category">Seleccione Categoría para editar</InputLabel>
+          <Select
+            value={category}
+            label="Categoría"
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setId(e.target.value);
+              setValidationErrors({ ...validationErrors, category: '' });
+            }}
+            inputProps={{
+              name: 'category',
+              id: 'outlined-category',
+            }}
+            error={!!validationErrors.category}
+          >
+            <MenuItem value="">
+                Ninguna
+            </MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat._id} value={cat._id}>
+                {cat.name}
+              </MenuItem>
+            ))}
+          </Select>
+  
+          <FormHelperText style={{ color: 'red' }}>{validationErrors.category || ' '}</FormHelperText>
+        </FormControl>
+      </Stack>
+    );
 
     const renderName = (
         <Stack spacing={1}>
@@ -67,6 +125,48 @@ export default function NewCategory({ openFilter, onOpenFilter, onCloseFilter, e
         </Stack>
     );
 
+    const updateCategorySelected = () => {
+        const data = {
+            name,
+            description,
+        };
+
+        const fieldsToValidate = {
+            name: 'Nombre categoria',
+            description: 'Descripción',
+
+        };
+
+        const errors = {};
+        const hasErrors = Object.keys(fieldsToValidate).some((field) => {
+            if (!String(data[field]).trim()) {
+                errors[field] = `El campo es obligatorio`;
+                return true;
+            }
+            return false;
+        });
+
+        if (hasErrors) {
+            setValidationErrors(errors);
+            setIsFormValid(false);
+            return;
+        }
+
+        updateCategory(id, data).then((res) => {
+            if (res.state === true) {
+                setId('');
+                setCategory('');
+                reloadData();
+                onCloseFilter();
+                setName('');
+                setDescription('');
+                setValidationErrors({});
+                setIsFormValid(true);
+                getCategoris()
+            };
+        });
+
+      };
 
     const categoryProduct = () => {
         const data = {
@@ -108,21 +208,14 @@ export default function NewCategory({ openFilter, onOpenFilter, onCloseFilter, e
         });
     };
 
-    useEffect(() => {
-        // Validar el formulario
-        const isNameValid = name.trim() !== '';
-        const isDescriptionValid = description.trim() !== '';
-
-
-        setIsFormValid(
-            isNameValid && isDescriptionValid
-        );
-    }, [name, description]);
-
-
+    
 
     return (
         <>
+
+
+
+
             <Button
                 disableRipple
                 color="inherit"
@@ -159,6 +252,7 @@ export default function NewCategory({ openFilter, onOpenFilter, onCloseFilter, e
                 <Scrollbar>
                     <Stack spacing={3} sx={{ p: 3 }}>
 
+                        {renderSelectCategory}
                         {renderName}
                         {renderDescription}
 
@@ -174,10 +268,12 @@ export default function NewCategory({ openFilter, onOpenFilter, onCloseFilter, e
                         color="inherit"
                         variant="outlined"
                         startIcon={<Iconify icon="ic:round-clear-all" />}
-                        onClick={categoryProduct}
+                        onClick={!category ? categoryProduct: updateCategorySelected}
                     >
-                        Guardar
+                        {!category ?  "Guardar" : "Actualizar"}
                     </Button>
+
+                    
                 </Box>
             </Drawer>
         </>
