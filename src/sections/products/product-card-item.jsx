@@ -1,82 +1,56 @@
+
 import PropTypes from 'prop-types';
 
-import { Box, Link, Grid, Paper, Button, styled, Typography, ButtonGroup } from '@mui/material';
+import { Stack, IconButton } from '@mui/material';
 
+import { disableProduct } from 'src/services/product-service';
 import { useProductContext } from 'src/contexts/product-Context';
 
+import Iconify from 'src/components/iconify';
 
-export default function ProductItem({ product }) {
-    const { cover, name, price, quantity } = product;
+export default function RenderButton({ product, icon, action, setOpenFilter, color }) {
+  const { handleAddToCart, reloadData } = useProductContext();
 
-
-
-
-    const { handleAddToCart, handleDeleteToCart } = useProductContext();
-    const handleIncrement = () => {
-        handleAddToCart(product);
-    };
-
-    const handleDecrement = () => {
-        handleDeleteToCart(product);
-    };
-
-    const Item = styled(Paper)(({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-        ...theme.typography.body2,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    }));
-
-    return (
+  
+  const handleClick = () => {
+    if (action === 'addToCart') {
     
+      handleAddToCart(product);
+    } else if (action === 'edit') {
+      setOpenFilter(true, product);
+    } else if (action === 'delete') {
+      disableProduct(product._id)
+        .then((response) => {
+          reloadData();
+        })
+        .catch((error) => console.error('Error disabling product:', error));
+    }
+  };
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={2}>
-          <Box
-            component="img"
-            alt={name}
-            src={cover}
-            sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }}
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Item style={{ textAlign: 'left' }}>
-            <Link color="inherit" variant="subtitle2" underline="hover">
-              Producto: {name}
-            </Link>
-
-            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-              Precio: {price}
-            </Typography>
-
-            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-              Cantidad: {quantity}
-            </Typography>
-          </Item>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Item>
-            <ButtonGroup
-              orientation="vertical"
-              aria-label="vertical outlined button group"
-              variant="text"
-            >
-              <Button size="small" color="success" variant="outlined" onClick={handleIncrement}>
-                +
-              </Button>
-              <Button size="small" color="error" variant="outlined" onClick={handleDecrement}>
-                -
-              </Button>
-            </ButtonGroup>
-          </Item>
-        </Grid>
-      </Grid>
-   
+  return (
+    <Stack direction="row" alignItems="center" justifyContent="space-between">
+      {action === 'addToCart' ? (
+        <IconButton
+          color={color}
+          aria-label="add to shopping cart"
+          onClick={handleClick}
+          disabled={!product.state || product.stock <= 0}
+        >
+          <Iconify icon={icon} width={24} height={24} />
+        </IconButton>
+      ) : (
+        <IconButton color={color} aria-label={action} onClick={handleClick}>
+          <Iconify icon={icon} width={24} height={24} />
+        </IconButton>
+      )}
+    </Stack>
   );
 }
 
-ProductItem.propTypes = {
-    product: PropTypes.object,
+RenderButton.propTypes = {
+  product: PropTypes.object,
+  icon: PropTypes.string,
+  action: PropTypes.string,
+  setOpenFilter: PropTypes.func,
+  color: PropTypes.string,
 };

@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 
 import Stack from '@mui/material/Stack';
+import { Snackbar } from '@mui/material';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import { getProducts } from 'src/services/product-service';
 import { useProductContext } from 'src/contexts/product-Context';
+
+import Toast from 'src/components/toast/toast';
 
 import NewProduct from '../product-new';
 import ProductCard from '../product-card';
@@ -17,6 +20,9 @@ import ProductFilters from '../product-filters';
 import NewCategory from '../product-new-category';
 import ProductCartWidget from '../product-cart-widget';
 
+
+  
+
 // ----------------------------------------------------------------------
 
 export default function ProductsView() {
@@ -24,17 +30,12 @@ export default function ProductsView() {
   const [openNewProduct, setOpenNewProduct] = useState(false);
   const [openNewCategory, setOpenNewCategory] = useState(false);
   const [editData, setEditData] = useState(null);
+  
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('Mensaje por defecto');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
   const { reload } = useProductContext();
-/*
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
-  };
-
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
-
-  */
 
   const handleOpenNewProduct = (product) => {
     setEditData({ isOpen: true, data: product });
@@ -54,8 +55,6 @@ export default function ProductsView() {
     setOpenNewCategory(false);
   };
 
-
-
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -63,10 +62,19 @@ export default function ProductsView() {
       .then(data => {
         setProducts(data.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching data:', error);
+        setSnackbarMessage('Error al cargar los productos');
+        setSnackbarSeverity('error');
+        showAlert();
       });
   }, [reload]);
+
+
+
+  const showAlert = () => {
+    setOpenSnackbar(true);
+  };
 
 
   return (
@@ -122,6 +130,21 @@ export default function ProductsView() {
           </Grid>
         ))}
       </Grid>
+
+
+      <Snackbar
+      open={openSnackbar}
+      autoHideDuration={6000}
+      onClose={() => setOpenSnackbar(false)}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    >
+      <Toast
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
+      />
+    </Snackbar>
 
       <ProductCartWidget />
     </Container>

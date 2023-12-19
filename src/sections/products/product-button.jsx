@@ -11,6 +11,7 @@ import Iconify from 'src/components/iconify';
 export default function RenderButton({ product, icon, action, setOpenFilter, color }) {
   const { handleAddToCart, reloadData } = useProductContext();
 
+  
   const handleClick = () => {
     if (action === 'addToCart') {
     

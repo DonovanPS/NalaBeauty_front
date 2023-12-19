@@ -8,15 +8,23 @@ import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import { Select, MenuItem, TextField, InputLabel, FormControl, FormHelperText } from '@mui/material';
+import {
+  Select,
+  MenuItem,
+  Snackbar,
+  TextField,
+  InputLabel,
+  FormControl,
+  FormHelperText,
+} from '@mui/material';
 
 import { getCategories } from 'src/services/category-service';
 import { useProductContext } from 'src/contexts/product-Context';
-import { createProduct , updateProduct } from 'src/services/product-service';
+import { createProduct, updateProduct } from 'src/services/product-service';
 
 import Iconify from 'src/components/iconify';
+import Toast from 'src/components/toast/toast';
 import Scrollbar from 'src/components/scrollbar';
-
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +43,10 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
   const [categories, setCategories] = useState([]);
   const { reloadData } = useProductContext();
 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('Mensaje por defecto');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
   useEffect(() => {
     if (editData?.data) {
       setId(editData.data._id || '');
@@ -46,12 +58,21 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
       setCategory(editData.data.category?._id || '');
     }
 
-    getCategories().then((response) => {
-      setCategories(response.data);
-    })
-      .catch((error) => console.error('Error fetching categories:', error));
+    getCategories()
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching categories:', error);
+        setSnackbarMessage('Error al cargar las categorías');
+        setSnackbarSeverity('error');
+        showAlert();
+      });
   }, [editData]);
 
+  const showAlert = () => {
+    setOpenSnackbar(true);
+  };
 
   const renderName = (
     <Stack spacing={1}>
@@ -78,7 +99,7 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
         label="Descripción"
         variant="outlined"
         onChange={(e) => {
-          setDescription(e.target.value)
+          setDescription(e.target.value);
           setValidationErrors({ ...validationErrors, description: '' });
         }}
         error={!!validationErrors.description}
@@ -100,7 +121,6 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
         }}
         error={!!validationErrors.image}
         helperText={validationErrors.image}
-
       />
     </Stack>
   );
@@ -114,16 +134,14 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
         variant="outlined"
         type="number"
         onChange={(e) => {
-          setPrice(e.target.value)
+          setPrice(e.target.value);
           setValidationErrors({ ...validationErrors, price: '' });
         }}
         error={!!validationErrors.price}
         helperText={validationErrors.price}
-
       />
     </Stack>
   );
-
 
   const renderStock = (
     <Stack spacing={1}>
@@ -134,12 +152,11 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
         variant="outlined"
         type="number"
         onChange={(e) => {
-          setStock(e.target.value)
+          setStock(e.target.value);
           setValidationErrors({ ...validationErrors, stock: '' });
         }}
         error={!!validationErrors.stock}
         helperText={validationErrors.stock}
-
       />
     </Stack>
   );
@@ -173,7 +190,6 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
     </Stack>
   );
 
-
   const saveProduct = () => {
     const data = {
       name,
@@ -183,7 +199,6 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
       price,
       category,
     };
-
 
     const fieldsToValidate = {
       name: 'Nombre del producto',
@@ -210,10 +225,18 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
     }
 
     if (editData?.data?._id) {
-         updateProduct(editData.data._id, data).then((response) => {
+      updateProduct(editData.data._id, data).then((response) => {
         if (response.state === true) {
           reloadData();
           onCloseFilter();
+
+          setSnackbarMessage(response.message);
+          setSnackbarSeverity('success');
+          showAlert();
+        }else{
+          setSnackbarMessage(`Error al actualizar el producto: ${response.message}`);
+          setSnackbarSeverity('error');
+          showAlert();
         }
       });
     } else {
@@ -222,6 +245,14 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
         if (response.state === true) {
           reloadData();
           onCloseFilter();
+
+          setSnackbarMessage(response.message);
+          setSnackbarSeverity('success');
+          showAlert();  
+        }else{
+          setSnackbarMessage(`Error al crear el producto: ${response.message}`);
+          setSnackbarSeverity('error');
+          showAlert();
         }
       });
     }
@@ -236,11 +267,14 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
     const isCategoryValid = category.trim() !== '';
 
     setIsFormValid(
-      isNameValid && isDescriptionValid && isPriceValid && isStockValid && isCategoryValid && isImageValid
+      isNameValid &&
+        isDescriptionValid &&
+        isPriceValid &&
+        isStockValid &&
+        isCategoryValid &&
+        isImageValid
     );
   }, [name, description, image, stock, price, category]);
-
-
 
   return (
     <>
@@ -279,14 +313,12 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
 
         <Scrollbar>
           <Stack spacing={3} sx={{ p: 3 }}>
-
             {renderName}
             {renderDescription}
             {renderImage}
             {renderStock}
             {renderPrice}
             {renderCategory}
-
           </Stack>
         </Scrollbar>
 
@@ -304,6 +336,20 @@ export default function NewProduct({ openFilter, onOpenFilter, onCloseFilter, ed
           </Button>
         </Box>
       </Drawer>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Toast
+          open={openSnackbar}
+          onClose={() => setOpenSnackbar(false)}
+          message={snackbarMessage}
+          severity={snackbarSeverity}
+        />
+      </Snackbar>
     </>
   );
 }

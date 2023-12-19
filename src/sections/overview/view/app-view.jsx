@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
-import { Stack, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { Stack, Snackbar, TextField } from '@mui/material';
 
 import { getSalesByDate, getStatisticsMonth } from 'src/services/sales-service';
+
+import Toast from 'src/components/toast/toast';
 
 import AppCurrentVisits from '../app-current-visits';
 import AppWidgetSummary from '../app-widget-summary';
@@ -27,6 +29,11 @@ export default function AppView() {
     return today;
   });
 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('Mensaje por defecto');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,11 +43,18 @@ export default function AppView() {
         setStatistics(response.data);
       } catch (error) {
         console.error('Error fetching sales:', error);
+        setSnackbarMessage('Error al cargar las estadisticas');
+        setSnackbarSeverity('error');
+        showAlert();
       }
     };
 
     fetchData();
   }, []);
+
+  const showAlert = () => {
+    setOpenSnackbar(true);
+  };
 
   useEffect(() => {
 
@@ -154,6 +168,22 @@ export default function AppView() {
 
     
       </Grid>
+
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Toast
+          open={openSnackbar}
+          onClose={() => setOpenSnackbar(false)}
+          message={snackbarMessage}
+          severity={snackbarSeverity}
+        />
+      </Snackbar>
+
     </Container>
   );
 }
